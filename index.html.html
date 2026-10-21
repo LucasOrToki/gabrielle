@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>um universo chamado "nós"</title>
+<style>
+:root {
+  --site-primary: #6b55a5;
+  --site-on-primary: #ffffff;
+  --site-secondary: #1d294c;
+  --site-on-secondary: #f6f1ff;
+  --site-background: #0d1024;
+  --site-on-background: #f6f1ff;
+  --site-font-body: "Trebuchet MS", system-ui, sans-serif;
+  --site-font-heading: "Courier New", monospace;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+#app {
+  min-height: 100vh; width: 100%; border-radius: 0;
+  background-color: light-dark(#f4f1ff, var(--site-background));
+  color: light-dark(#252042, var(--site-on-background));
+  overflow: hidden; position: relative;
+}
+.sky {
+  position: absolute; inset: 0; pointer-events: none; opacity: var(--site-decoration-opacity);
+  background-image: radial-gradient(#fff 1px, transparent 1.5px), radial-gradient(#c9b7ff 1px, transparent 1.5px);
+  background-size: 71px 71px, 113px 113px; background-position: 7px 13px, 32px 47px;
+}
+.shell { position: relative; max-width: 1100px; margin: auto; padding: 24px; }
+header { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom: 18px; }
+.brand { font-family:var(--site-font-heading); font-weight:bold; letter-spacing:1px; font-size:calc(17px * var(--site-heading-scale)); }
+.chip { border:1px solid #8b7cbd; border-radius:99px; padding:8px 12px; font-size:12px; background: light-dark(#fff, #171a35); }
+.intro { text-align:center; padding:18px 0 22px; }
+.kicker { text-transform:uppercase; letter-spacing:3px; font-size:11px; color:light-dark(#6d5c9b,#c6b6ff); }
+h1 { font-family:var(--site-font-heading); font-size:clamp(26px,5vw,46px); line-height:1.1; margin:12px 0; color:light-dark(#30244e,#f4d98b); }
+.subtitle { max-width:600px; margin:0 auto; line-height:1.65; color:light-dark(#655c7d,#c9c9e6); }
+.game-layout { display:grid; grid-template-columns:minmax(0, 1.7fr) minmax(240px, .8fr); gap:18px; align-items:stretch; }
+.game-frame { background:#151a39; border:3px solid #7868ad; border-radius:12px; padding:10px; box-shadow:0 10px 35px #07091c80; }
+canvas { display:block; width:100%; image-rendering:pixelated; border-radius:5px; background:#12172e; }
+.game-help { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; color:#c8c7e7; font-size:12px; padding:10px 2px 2px; }
+.panel { border:1px solid light-dark(#d8d0ed,#34365d); background:light-dark(#fff,#171a35); border-radius:12px; padding:18px; }
+.panel h2 { margin:0 0 10px; font: bold 16px var(--site-font-heading); }
+.panel p { font-size:13px; line-height:1.6; color:light-dark(#645c7a,#c6c5df); }
+.progress { height:8px; background:light-dark(#e8e2f5,#303354); border-radius:9px; overflow:hidden; margin:12px 0 8px; }
+.progress > div { height:100%; width:0; background:#f0ce75; transition:width .25s; }
+.star-list { display:flex; gap:7px; margin:14px 0; }
+.star-dot { width:25px;height:25px;border:1px solid #6e6593;border-radius:6px;display:grid;place-items:center;color:#777; font-size:12px; }
+.star-dot.found { background:#f0ce75;color:#28213f;border-color:#f0ce75; }
+button { cursor:pointer; font: bold 13px var(--site-font-body); border:1px solid #9a88d0; border-radius:8px; padding:11px 13px; background:var(--site-primary); color:var(--site-on-primary); }
+button:hover { filter:brightness(1.12); }
+button:focus-visible { outline:3px solid #f0ce75; outline-offset:3px; }
+.secondary { background:transparent; color:light-dark(#514276,#e1d8ff); }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.story { margin-top:18px; display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.quote { font-family:var(--site-font-heading); font-size:15px; line-height:1.65; color:light-dark(#47356e,#f3d991); }
+.note { font-size:12px; line-height:1.6; color:light-dark(#6b627e,#c1c0dc); }
+footer { text-align:center; padding:24px 0 12px; color:light-dark(#746b89,#9b9abb); font-size:11px; }
+.modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:18px; background:#050617c9; z-index:5; }
+.modal-backdrop.open { display:flex; }
+.modal { max-width:520px; width:100%; background:#171a35; color:#f8f3ff; border:2px solid #8271bd; border-radius:12px; padding:24px; box-shadow:0 20px 80px #0009; }
+.modal .symbol { font-size:28px; color:#f0ce75; }
+.modal h2 { font: bold 20px var(--site-font-heading); color:#f0d995; margin:12px 0; }
+.modal p { line-height:1.75; color:#e0dcf5; }
+.modal .close-row { display:flex; justify-content:flex-end; margin-top:18px; }
+@media(max-width:760px) {
+ .shell { padding:16px; } .game-layout { grid-template-columns:1fr; }
+ .story { grid-template-columns:1fr; } .panel { padding:15px; }
+}
+</style>
+</head>
+<body>
+<div id="app" data-sites-preview-theme="custom">
+  <div class="sky"></div>
+  <main class="shell">
+    <header>
+      <div class="brand">✦ SAVE FILE: NÓS DOIS</div>
+      <div class="chip">CAPÍTULO 01 · DESDE 07.09.2026</div>
+    </header>
+    <section class="intro">
+      <div class="kicker">um pequeno mundo feito com carinho</div>
+      <h1>um universo chamado "nós"</h1>
+      <p class="subtitle">Oiiiii meu amor. Tem algumas estrelinhas escondidas por aqui. Explore esse cantinho, encontre todas elas e descubra o que deixei guardado para você, totosa.</p>
+    </section>
+    <section class="game-layout">
+      <div class="game-frame">
+        <canvas id="game" width="480" height="320" aria-label="Jogo de exploração em pixel art. Use as setas ou WASD para mover o personagem e encontrar estrelas."></canvas>
+        <div class="game-help"><span>⌨ SETAS / WASD para andar</span><span>✦ Encoste nas estrelas</span><span>▣ Explorar: <b id="foundCount">0</b>/5</span></div>
+      </div>
+      <aside class="panel">
+        <h2>DIÁRIO DE BORDO</h2>
+        <p id="status">Encontre as cinco estrelas para desbloquear uma cartinha no final.</p>
+        <div class="progress"><div id="progressFill"></div></div>
+        <div class="star-list" aria-label="Progresso das estrelas">
+          <span class="star-dot" id="dot0">✦</span><span class="star-dot" id="dot1">✦</span><span class="star-dot" id="dot2">✦</span><span class="star-dot" id="dot3">✦</span><span class="star-dot" id="dot4">✦</span>
+        </div>
+        <p><b>Missão:</b> Caminhe pelo jardim noturno. Cada estrela guarda uma mensagem. Não precisa ter pressa. Esse mundo é seu.</p>
+        <div class="actions">
+          <button id="startBtn">Começar aventura</button>
+          <button class="secondary" id="resetBtn">Recomeçar</button>
+        </div>
+      </aside>
+    </section>
+    <section class="story">
+      <div class="panel">
+        <h2>UMA COISA QUE EU QUERIA TE DIZER</h2>
+        <div class="quote"><b>“Somente quando encontramos o amor é que descobrimos o que nos faltava na vida.” — John Ruskin</b></div>
+        <p class="note">Essa é só uma mensagem de começo. As outras estão escondidas no mapa.</p>
+      </div>
+      <div class="panel">
+        <h2>COMO JOGAR</h2>
+        <p>1. Clique em <b>Começar aventura</b>. 2. Use as setas do teclado ou W, A, S, D. 3. Chegue perto das estrelas douradas. 4. Leia cada mensagem e encontre as cinco.</p>
+        <p class="note">Dica: dá para jogar no celular com os botões direcionais que aparecem abaixo do mapa!</p>
+        <div class="actions" id="mobileControls">
+          <button class="secondary" data-move="up" aria-label="Mover para cima">▲</button>
+          <button class="secondary" data-move="left" aria-label="Mover para esquerda">◀</button>
+          <button class="secondary" data-move="down" aria-label="Mover para baixo">▼</button>
+          <button class="secondary" data-move="right" aria-label="Mover para direita">▶</button>
+        </div>
+      </div>
+    </section>
+    <footer>feito à mão, com carinho · uma pequena aventura para a Gabrielle ✦</footer>
+  </main>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="symbol" id="modalSymbol">✦</div>
+    <h2 id="modalTitle">Uma estrelinha para você</h2>
+    <p id="modalText"></p>
+    <div class="close-row"><button id="modalClose">Guardar no coração ✦</button></div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const messages = [
+    {title:'O começo da nossa história', text:'07 de setembro de 2026. Uma data que ganhou um lugar especial na minha história porque marca o começo de "nós". Talvez seja só um dia no calendário para o mundo, mas para mim é o início de algo que quero cuidar com carinho.'},
+    {title:'Meu lugar favorito', text:'Não precisa ser um lugar perfeito, nem uma cena de filme. Gosto da ideia de que um lugar pode ficar especial só porque você está nele. Às vezes, o que faz um momento valer a pena é simplesmente poder dividir ele com você.'},
+    {title:'Pequenas coisas, grandes sentimentos', text:'Quero continuar descobrindo as suas manias, os seus gostos, as coisas que te fazem rir e até os detalhes que você acha que ninguém percebe. Amar também é prestar atenção, aprender e escolher cuidar.'},
+    {title:'Uma promessa tranquila', text:'Não prometo que todos os dias vão ser perfeitos. Prometo que quero conversar, aprender com os erros e construir as coisas com você, um dia de cada vez.'},
+    {title:'A estrela mais importante', text:'Se você chegou até aqui, encontrou todas as estrelinhas deste pequeno universo. Mas a parte mais bonita não é o jogo que eu fiz: é ter alguém como você para quem eu quis fazer algo assim. Obrigado por fazer parte da minha vida, EU TE AMO, Gabrielle. 💜'}
+  ];
+  const player = {x:42,y:265,w:12,h:16,speed:2.2};
+  const stars = [
+    {x:110,y:76,found:false},{x:225,y:245,found:false},{x:350,y:84,found:false},
+    {x:425,y:200,found:false},{x:260,y:135,found:false}
+  ];
+  const trees = [[28,35],[78,135],[145,205],[180,52],[300,48],[390,130],[445,45],[52,215],[390,270],[175,280],[315,190],[90,40]];
+  let started=false, keys={}, lastMessage=-1, modalOpen=false, complete=false, tick=0;
+  const colors = {grass:'#1a3850',grass2:'#20475a',path:'#4b466e',path2:'#5d557f',tree:'#183b43',leaf:'#2c665e',gold:'#f4d36e',pink:'#e9a4c7'};
+  function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h);}
+  function draw(){
+    tick++;
+    rect(0,0,480,320,'#12172e');
+    // Pixel-art meadow
+    for(let y=0;y<320;y+=16) for(let x=0;x<480;x+=16) rect(x,y,16,16,((x/16+y/16)%3===0)?colors.grass:colors.grass2);
+    // winding lavender path
+    for(let x=0;x<480;x+=16){let yy=218-Math.sin(x/58)*34;rect(x,yy,16,28,colors.path);rect(x,yy+5,16,4,colors.path2);}
+    for(let y=0;y<320;y+=16){let xx=236+Math.sin(y/48)*30;rect(xx,y,20,16,colors.path);}
+    // distant hills and moon
+    rect(0,0,480,42,'#171c3b');rect(30,24,90,18,'#20284c');rect(340,18,110,22,'#20284c');
+    rect(390,30,18,18,'#f5e4a4');rect(382,38,18,18,'#f5e4a4');rect(398,38,18,18,'#f5e4a4');rect(390,46,18,18,'#f5e4a4');
+    // tiny stars in sky
+    for(let i=0;i<22;i++){let x=(i*73+19)%475,y=(i*31+9)%95;if((i+tick/20|0)%4!==0)rect(x,y,2,2,'#c9c8f4');}
+    // trees
+    trees.forEach(([x,y],i)=>{rect(x+4,y+8,8,13,'#624e59');rect(x,y,16,12,colors.tree);rect(x+3,y-4,10,10,colors.leaf);rect(x+5,y+2,3,3,'#4a8a72');});
+    // flower patches
+    for(let i=0;i<24;i++){let x=(i*61+17)%470,y=(i*47+90)%300;if(Math.abs(y-(218-Math.sin(x/58)*34))>30) {rect(x,y,3,3,i%3===0?colors.pink:'#b9a5e9');}}
+    // collectible stars
+    stars.forEach((s,i)=>{if(s.found)return;let bob=Math.sin((tick+i*9)/8)*2;let x=s.x,y=s.y+bob;rect(x+4,y,6,2,colors.gold);rect(x+2,y+2,10,3,colors.gold);rect(x+4,y+5,6,3,colors.gold);rect(x+5,y+8,4,2,'#c88b51');if(Math.floor(tick/22)%2===0)rect(x-2,y+3,2,2,'#fff1b2');});
+    // player shadow + tiny adventurer
+    rect(player.x-1,player.y+13,14,4,'#0b1325');rect(player.x+2,player.y+1,8,8,'#f1c9a7');rect(player.x+1,player.y,10,4,'#6e4c8c');rect(player.x,player.y+7,12,7,'#bd8dd4');rect(player.x+1,player.y+8,3,5,'#f0d36f');rect(player.x+2,player.y+14,3,3,'#d6c4f4');rect(player.x+7,player.y+14,3,3,'#d6c4f4');
+    if(!started){ctx.fillStyle='#090d20c9';ctx.fillRect(0,0,480,320);ctx.fillStyle='#f4d98b';ctx.textAlign='center';ctx.font='bold 15px monospace';ctx.fillText('SEU UNIVERSO COMEÇA AQUI',240,144);ctx.fillStyle='#e0ddf8';ctx.font='11px monospace';ctx.fillText('aperte “Começar aventura”',240,166);}
+    if(complete){ctx.fillStyle='#090d20a8';ctx.fillRect(0,0,480,320);ctx.fillStyle='#f4d98b';ctx.textAlign='center';ctx.font='bold 18px monospace';ctx.fillText('TODAS AS ESTRELAS ENCONTRADAS!',240,150);ctx.fillStyle='#e0ddf8';ctx.font='12px monospace';ctx.fillText('a cartinha fica para um próximo jogo ✦',240,174);}
+    requestAnimationFrame(draw);
+  }
+  function updateProgress(){
+    let n=stars.filter(s=>s.found).length;
+    document.getElementById('foundCount').textContent=n;
+    document.getElementById('progressFill').style.width=(n/5*100)+'%';
+    stars.forEach((s,i)=>document.getElementById('dot'+i).classList.toggle('found',s.found));
+    document.getElementById('status').textContent=n===0?'Procure as estrelinhas douradas, danada.':n<5?`Você encontrou ${n} de 5 estrelas. Cada uma guarda um pedacinho do que quero te dizer.`:'Você encontrou todas as estrelas. A carta final será desbloqueada em um próximo jogo.';
+    if(n===5&&!complete){complete=true;}
+  }
+  function openModal(i){
+    modalOpen=true;
+    const backdrop=document.getElementById('modalBackdrop');
+    if(i===5){return;}
+    else {document.getElementById('modalSymbol').textContent='✦';document.getElementById('modalTitle').textContent=messages[i].title;document.getElementById('modalText').textContent=messages[i].text;}
+    backdrop.classList.add('open');document.getElementById('modalClose').focus();
+  }
+  function closeModal(){modalOpen=false;document.getElementById('modalBackdrop').classList.remove('open');}
+  function move(dir){
+    if(!started||modalOpen)return;
+    const dx=dir==='left'?-player.speed:dir==='right'?player.speed:0;
+    const dy=dir==='up'?-player.speed:dir==='down'?player.speed:0;
+    player.x=Math.max(4,Math.min(464,player.x+dx));player.y=Math.max(68,Math.min(296,player.y+dy));
+    stars.forEach((s,i)=>{if(!s.found&&Math.hypot((player.x+6)-s.x,(player.y+7)-s.y)<19){s.found=true;lastMessage=i;openModal(i);updateProgress();}});
+  }
+  document.addEventListener('keydown',e=>{
+    const key=e.key.toLowerCase();
+    if(key==='escape'&&modalOpen){closeModal();return;}
+    if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' '].includes(key))e.preventDefault();
+    if(key==='arrowup'||key==='w')move('up');
+    if(key==='arrowdown'||key==='s')move('down');
+    if(key==='arrowleft'||key==='a')move('left');
+    if(key==='arrowright'||key==='d')move('right');
+  });
+  document.getElementById('startBtn').addEventListener('click',()=>{started=true;document.getElementById('status').textContent='Procure as estrelinhas douradas, danada.';});
+  document.getElementById('resetBtn').addEventListener('click',()=>{stars.forEach(s=>s.found=false);player.x=42;player.y=265;started=true;complete=false;closeModal();updateProgress();});
+  document.getElementById('modalClose').addEventListener('click',closeModal);
+  document.getElementById('modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')closeModal();});
+  document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('click',()=>move(b.dataset.move));});
+  updateProgress();draw();
+})();
+</script>
+</body>
+</html>
